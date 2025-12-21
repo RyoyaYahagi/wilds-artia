@@ -33,7 +33,7 @@ export const GROUP_SKILLS = [
 
 /** ボーナス種別 */
 export const BONUS_TYPES = [
-    '攻撃', '会心率', '防御', '属性値', '状態異常', 'スロット'
+    '攻撃', '会心率', '属性値', '斬れ味', '装填'
 ] as const;
 
 /** ボーナス値 */

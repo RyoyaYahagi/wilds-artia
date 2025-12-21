@@ -11,6 +11,7 @@ import { useRestore } from '../hooks/useRestore';
 import { BONUS_TYPES, BONUS_VALUES, WEAPON_TYPES, ELEMENT_TYPES } from '../constants';
 import { OptimizationChart } from './OptimizationChart';
 import { ConfirmModal } from './ConfirmModal';
+import { useToast } from './Toast';
 import type {
     OptimizationResult, RestoreResult, Track,
     WeaponType, ElementType
@@ -94,6 +95,8 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
         toggleTarget, deleteResult, clearAll, getResultsByTrack
     } = useRestore(store);
 
+    const { showToast } = useToast();
+
     // トラック追加用
     const [newWeapon, setNewWeapon] = useState<WeaponType>('双剣');
     const [newElement, setNewElement] = useState<ElementType>('火');
@@ -110,9 +113,15 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
     const [showModal, setShowModal] = useState(false);
 
     const handleAddTrack = useCallback(async () => {
+        // 同じ武器種+属性の組み合わせが既に存在するかチェック
+        const exists = tracks.some(t => t.weaponType === newWeapon && t.element === newElement);
+        if (exists) {
+            showToast(`${newElement}属性の${newWeapon}は既に追加されています`);
+            return;
+        }
         const id = await addTrack(newWeapon, newElement);
         setExpandedTracks(prev => new Set([...prev, id]));
-    }, [addTrack, newWeapon, newElement]);
+    }, [addTrack, newWeapon, newElement, tracks]);
 
     const toggleExpand = useCallback((trackId: string) => {
         setExpandedTracks(prev => {
@@ -263,8 +272,8 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
                                                 <button
                                                     onClick={() => toggleTarget(result.id)}
                                                     className={`p-1.5 rounded-lg transition-colors ${result.isTarget
-                                                            ? 'bg-green-500 text-white'
-                                                            : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
+                                                        ? 'bg-green-500 text-white'
+                                                        : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
                                                         }`}
                                                 >
                                                     <Target className="w-4 h-4" />
@@ -296,8 +305,8 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
                                                             key={v}
                                                             onClick={() => setSelectedValue(v)}
                                                             className={`px-2 py-2 text-xs rounded-lg ${selectedValue === v
-                                                                    ? 'bg-orange-500 text-white'
-                                                                    : 'bg-zinc-800 text-zinc-400'
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'bg-zinc-800 text-zinc-400'
                                                                 }`}
                                                         >
                                                             {v}

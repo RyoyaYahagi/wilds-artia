@@ -13,6 +13,7 @@ import {
 } from '../constants';
 import { OptimizationChart } from './OptimizationChart';
 import { ConfirmModal } from './ConfirmModal';
+import { useToast } from './Toast';
 import type {
     OptimizationResult, KyogekiSkillResult, Track,
     WeaponType, ElementType
@@ -92,6 +93,8 @@ export function KyogekiSkillMode() {
         toggleTarget, deleteResult, clearAll, getResultsByTrack
     } = useKyogekiSkill();
 
+    const { showToast } = useToast();
+
     // トラック追加用
     const [newWeapon, setNewWeapon] = useState<WeaponType>('双剣');
     const [newElement, setNewElement] = useState<ElementType>('火');
@@ -107,9 +110,15 @@ export function KyogekiSkillMode() {
     const [showModal, setShowModal] = useState(false);
 
     const handleAddTrack = useCallback(async () => {
+        // 同じ武器種+属性の組み合わせが既に存在するかチェック
+        const exists = tracks.some(t => t.weaponType === newWeapon && t.element === newElement);
+        if (exists) {
+            showToast(`${newElement}属性の${newWeapon}は既に追加されています`);
+            return;
+        }
         const id = await addTrack(newWeapon, newElement);
         setExpandedTracks(prev => new Set([...prev, id]));
-    }, [addTrack, newWeapon, newElement]);
+    }, [addTrack, newWeapon, newElement, tracks]);
 
     const toggleExpand = useCallback((trackId: string) => {
         setExpandedTracks(prev => {
