@@ -5,7 +5,7 @@
 import { useState, useCallback } from 'react';
 import {
     Target, Trash2, Plus, Sparkles, RotateCcw, Zap,
-    ChevronDown, ChevronUp, Flame
+    ChevronDown, ChevronUp, Flame, Download
 } from 'lucide-react';
 import { useKyogekiSkill } from '../hooks/useKyogekiSkill';
 import {
@@ -31,6 +31,33 @@ function getElementColor(element: ElementType): string {
     return colors[element] || 'text-zinc-400';
 }
 
+/** テストデータ生成 */
+function generateTestData(): { weaponType: WeaponType; element: ElementType; results: { series: string; group: string; isTarget: boolean }[] }[] {
+    return [
+        {
+            weaponType: '双剣',
+            element: '火',
+            results: [
+                { series: '火竜の力', group: '-', isTarget: false },
+                { series: 'ハズレ', group: '-', isTarget: false },
+                { series: '闘獣の力', group: 'ヌシの魂', isTarget: true },
+                { series: 'ハズレ', group: '-', isTarget: false },
+                { series: '暗器蛸の力', group: '-', isTarget: false },
+            ],
+        },
+        {
+            weaponType: '太刀',
+            element: '雷',
+            results: [
+                { series: 'ハズレ', group: '-', isTarget: false },
+                { series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { series: 'ハズレ', group: '-', isTarget: false },
+                { series: '煌雷竜の力', group: 'ヌシの魂', isTarget: true },
+            ],
+        },
+    ];
+}
+
 /** 最適化チャート生成（全トラック横断） */
 function generateOptimization(
     tracks: Track[],
@@ -41,7 +68,6 @@ function generateOptimization(
         return { steps: [], maxIndex: 0, conflicts: [] };
     }
 
-    // 同一インデックスの競合検出
     const indexMap = new Map<number, KyogekiSkillResult[]>();
     for (const t of targets) {
         const existing = indexMap.get(t.index) || [];
@@ -99,18 +125,18 @@ export function KyogekiSkillMode() {
     const [newWeapon, setNewWeapon] = useState<WeaponType>('双剣');
     const [newElement, setNewElement] = useState<ElementType>('火');
 
-    // 結果入力用（トラックごとに選択状態を管理）
+    // 結果入力用
     const [selectedSeries, setSelectedSeries] = useState<string>(SERIES_SKILLS[0]);
 
     // 展開中のトラック
     const [expandedTracks, setExpandedTracks] = useState<Set<string>>(new Set());
 
-    // モーダル・最適化
+    // モーダル
     const [optimization, setOptimization] = useState<OptimizationResult | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showClearModal, setShowClearModal] = useState(false);
+    const [showTestModal, setShowTestModal] = useState(false);
 
     const handleAddTrack = useCallback(async () => {
-        // 同じ武器種+属性の組み合わせが既に存在するかチェック
         const exists = tracks.some(t => t.weaponType === newWeapon && t.element === newElement);
         if (exists) {
             showToast(`${newElement}属性の${newWeapon}は既に追加されています`);
@@ -118,7 +144,7 @@ export function KyogekiSkillMode() {
         }
         const id = await addTrack(newWeapon, newElement);
         setExpandedTracks(prev => new Set([...prev, id]));
-    }, [addTrack, newWeapon, newElement, tracks]);
+    }, [addTrack, newWeapon, newElement, tracks, showToast]);
 
     const toggleExpand = useCallback((trackId: string) => {
         setExpandedTracks(prev => {
@@ -141,12 +167,48 @@ export function KyogekiSkillMode() {
         setOptimization(result);
     }, [tracks, results]);
 
+    // 全削除（バックアップ付き）
     const handleClear = useCallback(async () => {
+        // 削除前にバックアップを保存
+        const backup = {
+            timestamp: new Date().toISOString(),
+            tracks,
+            results,
+        };
+        try {
+            const existing = localStorage.getItem('kyogekiSkill_deleted');
+            const deleted = existing ? JSON.parse(existing) : [];
+            deleted.unshift(backup);
+            // 最新5件のみ保持
+            localStorage.setItem('kyogekiSkill_deleted', JSON.stringify(deleted.slice(0, 5)));
+        } catch (e) {
+            console.error('Backup failed:', e);
+        }
+
         await clearAll();
         setOptimization(null);
-        setShowModal(false);
+        setShowClearModal(false);
         setExpandedTracks(new Set());
-    }, [clearAll]);
+        showToast('データを削除しました（バックアップ保存済み）', 'success');
+    }, [clearAll, tracks, results, showToast]);
+
+    // テストデータ読込
+    const handleLoadTestData = useCallback(async () => {
+        const testData = generateTestData();
+        for (const data of testData) {
+            const exists = tracks.some(t => t.weaponType === data.weaponType && t.element === data.element);
+            if (exists) continue;
+
+            const trackId = await addTrack(data.weaponType, data.element);
+            setExpandedTracks(prev => new Set([...prev, trackId]));
+
+            for (const r of data.results) {
+                await addResult(trackId, r.series, r.group, r.isTarget);
+            }
+        }
+        setShowTestModal(false);
+        showToast('テストデータを読み込みました', 'success');
+    }, [addTrack, addResult, tracks, showToast]);
 
     if (isLoading) {
         return (
@@ -157,7 +219,25 @@ export function KyogekiSkillMode() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
+            {/* ツールバー（右上） */}
+            <div className="flex items-center justify-end gap-2">
+                <button
+                    onClick={() => setShowTestModal(true)}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"
+                >
+                    <Download className="w-3.5 h-3.5" />
+                    テストデータ
+                </button>
+                <button
+                    onClick={() => setShowClearModal(true)}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    全削除
+                </button>
+            </div>
+
             {/* トラック追加エリア */}
             <section className="bg-zinc-900 rounded-xl p-4 border border-zinc-800">
                 <h2 className="text-sm font-semibold text-zinc-400 mb-3 flex items-center gap-2">
@@ -334,19 +414,12 @@ export function KyogekiSkillMode() {
                 </section>
             )}
 
-            {/* ツールバー */}
+            {/* 最適化実行ボタン */}
             {tracks.length > 0 && (
-                <div className="flex items-center justify-between">
-                    <button
-                        onClick={() => setShowModal(true)}
-                        className="flex items-center gap-1 px-3 py-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg text-sm"
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                        全削除
-                    </button>
+                <div className="flex justify-center pt-4">
                     <button
                         onClick={handleGenerate}
-                        className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-orange-500/25 transition-all hover:scale-105"
+                        className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-orange-500/25 transition-all hover:scale-105"
                     >
                         <Sparkles className="w-5 h-5" />
                         最適化実行
@@ -357,15 +430,25 @@ export function KyogekiSkillMode() {
             {/* 最適化結果 */}
             <OptimizationChart result={optimization} />
 
-            {/* 確認モーダル */}
+            {/* 全削除確認モーダル */}
             <ConfirmModal
-                isOpen={showModal}
+                isOpen={showClearModal}
                 title="全データの削除"
-                message="すべてのトラックと試行履歴を削除しますか？この操作は取り消せません。"
+                message="すべてのトラックと試行履歴を削除しますか？削除前のデータはバックアップとして保存されます。"
                 confirmText="削除する"
                 isDestructive
                 onConfirm={handleClear}
-                onCancel={() => setShowModal(false)}
+                onCancel={() => setShowClearModal(false)}
+            />
+
+            {/* テストデータ確認モーダル */}
+            <ConfirmModal
+                isOpen={showTestModal}
+                title="テストデータの読込"
+                message="サンプルの武器トラックとスキルデータを読み込みます。既存のデータは維持されます。"
+                confirmText="読み込む"
+                onConfirm={handleLoadTestData}
+                onCancel={() => setShowTestModal(false)}
             />
         </div>
     );
