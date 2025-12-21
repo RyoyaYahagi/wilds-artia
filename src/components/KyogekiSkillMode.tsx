@@ -12,6 +12,7 @@ import {
     SERIES_SKILLS, WEAPON_TYPES, ELEMENT_TYPES
 } from '../constants';
 import { OptimizationChart } from './OptimizationChart';
+import { SkillTable } from './SkillTable';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from './Toast';
 import type {
@@ -618,6 +619,9 @@ export function KyogekiSkillMode() {
 
             {/* 最適化結果 */}
             <OptimizationChart result={optimization} />
+
+            {/* スキルテーブル */}
+            {optimization && <SkillTable tracks={tracks} results={results} />}
 
             {/* 全削除確認モーダル */}
             <ConfirmModal
