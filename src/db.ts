@@ -4,27 +4,36 @@
  */
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import type { KyogekiSkillEntry, RestoreEntry } from './types';
+import type { Track, KyogekiSkillResult, RestoreResult } from './types';
 
 interface ArtianDB extends DBSchema {
-    normalRestore: {
+    // トラック管理
+    tracks: {
         key: string;
-        value: RestoreEntry;
-        indexes: { 'by-index': number };
+        value: Track & { mode: string };
+        indexes: { 'by-mode': string };
     };
-    kyogekiSkill: {
+    // 巨戟スキル再付与結果
+    kyogekiSkillResults: {
         key: string;
-        value: KyogekiSkillEntry;
-        indexes: { 'by-index': number };
+        value: KyogekiSkillResult;
+        indexes: { 'by-track': string; 'by-index': number };
     };
-    kyogekiRestore: {
+    // 通常復元強化結果
+    normalRestoreResults: {
         key: string;
-        value: RestoreEntry;
-        indexes: { 'by-index': number };
+        value: RestoreResult;
+        indexes: { 'by-track': string; 'by-index': number };
+    };
+    // 巨戟復元強化結果
+    kyogekiRestoreResults: {
+        key: string;
+        value: RestoreResult;
+        indexes: { 'by-track': string; 'by-index': number };
     };
 }
 
-const DB_NAME = 'ArtianOptimizerDB';
+const DB_NAME = 'ArtianOptimizerDB_v2';
 const DB_VERSION = 1;
 
 let dbInstance: IDBPDatabase<ArtianDB> | null = null;
@@ -36,21 +45,30 @@ export async function getDB(): Promise<IDBPDatabase<ArtianDB>> {
 
     dbInstance = await openDB<ArtianDB>(DB_NAME, DB_VERSION, {
         upgrade(db) {
-            // 通常復元強化ストア
-            if (!db.objectStoreNames.contains('normalRestore')) {
-                const store = db.createObjectStore('normalRestore', { keyPath: 'id' });
+            // トラックストア
+            if (!db.objectStoreNames.contains('tracks')) {
+                const store = db.createObjectStore('tracks', { keyPath: 'id' });
+                store.createIndex('by-mode', 'mode');
+            }
+
+            // 巨戟スキル結果ストア
+            if (!db.objectStoreNames.contains('kyogekiSkillResults')) {
+                const store = db.createObjectStore('kyogekiSkillResults', { keyPath: 'id' });
+                store.createIndex('by-track', 'trackId');
                 store.createIndex('by-index', 'index');
             }
 
-            // 巨戟スキル再付与ストア
-            if (!db.objectStoreNames.contains('kyogekiSkill')) {
-                const store = db.createObjectStore('kyogekiSkill', { keyPath: 'id' });
+            // 通常復元結果ストア
+            if (!db.objectStoreNames.contains('normalRestoreResults')) {
+                const store = db.createObjectStore('normalRestoreResults', { keyPath: 'id' });
+                store.createIndex('by-track', 'trackId');
                 store.createIndex('by-index', 'index');
             }
 
-            // 巨戟復元強化ストア
-            if (!db.objectStoreNames.contains('kyogekiRestore')) {
-                const store = db.createObjectStore('kyogekiRestore', { keyPath: 'id' });
+            // 巨戟復元結果ストア
+            if (!db.objectStoreNames.contains('kyogekiRestoreResults')) {
+                const store = db.createObjectStore('kyogekiRestoreResults', { keyPath: 'id' });
+                store.createIndex('by-track', 'trackId');
                 store.createIndex('by-index', 'index');
             }
         },

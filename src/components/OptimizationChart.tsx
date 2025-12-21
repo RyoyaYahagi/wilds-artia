@@ -28,13 +28,19 @@ export function OptimizationChart({ result }: OptimizationChartProps) {
                         <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-red-400 font-medium mb-2">
-                                同時取得不可能な競合があります
+                                ⚠️ 同時取得不可能な競合があります
                             </p>
                             <ul className="space-y-1 text-sm text-red-300">
                                 {result.conflicts.map((conflict) => (
                                     <li key={conflict.index}>
-                                        Index {conflict.index}:{' '}
-                                        {conflict.entries.map((e) => e.label).join(' と ')}
+                                        <span className="font-mono">#{conflict.index}</span>:
+                                        {conflict.entries.map((e, i) => (
+                                            <span key={i}>
+                                                {i > 0 && ' と '}
+                                                <span className="text-red-200">{e.trackLabel}</span>
+                                                <span className="text-red-400">({e.label})</span>
+                                            </span>
+                                        ))}
                                     </li>
                                 ))}
                             </ul>
@@ -48,8 +54,7 @@ export function OptimizationChart({ result }: OptimizationChartProps) {
                 <div className="p-8 text-center text-zinc-500">
                     <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p className="text-sm">
-                        Targetが設定されていません。
-                        <br />
+                        Targetが設定されていません。<br />
                         本命のスキルにTargetボタンを押してください。
                     </p>
                 </div>
@@ -58,14 +63,14 @@ export function OptimizationChart({ result }: OptimizationChartProps) {
                     {result.steps.map((step) => (
                         <div
                             key={step.index}
-                            className={`flex items-center gap-4 p-4 ${step.type === 'target' ? 'bg-green-500/10' : 'bg-zinc-800/30'
+                            className={`flex items-center gap-3 p-3 ${step.type === 'target' ? 'bg-green-500/10' : 'bg-zinc-800/30'
                                 }`}
                         >
-                            <span className="w-12 text-center font-mono text-sm text-zinc-500">
+                            <span className="w-10 text-center font-mono text-sm text-zinc-500">
                                 #{step.index}
                             </span>
                             <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${step.type === 'target'
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${step.type === 'target'
                                         ? 'bg-green-500/20 text-green-400'
                                         : 'bg-zinc-700 text-zinc-400'
                                     }`}
@@ -73,11 +78,14 @@ export function OptimizationChart({ result }: OptimizationChartProps) {
                                 {step.type === 'target' ? '本命' : '捨て'}
                             </span>
                             <span
-                                className={`flex-1 ${step.type === 'target'
+                                className={`flex-1 text-sm ${step.type === 'target'
                                         ? 'text-green-300 font-medium'
                                         : 'text-zinc-400'
                                     }`}
                             >
+                                {step.trackLabel && (
+                                    <span className="text-zinc-500 mr-1">[{step.trackLabel}]</span>
+                                )}
                                 {step.label}
                                 {step.type === 'target' && (
                                     <span className="ml-2 text-green-400">→ Get!</span>
@@ -93,11 +101,12 @@ export function OptimizationChart({ result }: OptimizationChartProps) {
                 <div className="p-4 bg-zinc-800/50 border-t border-zinc-800">
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-zinc-400">
-                            総強化回数: {result.maxIndex}回
+                            総強化回数: <span className="text-zinc-200 font-medium">{result.maxIndex}回</span>
                         </span>
                         <span className="text-zinc-400">
-                            本命回収:{' '}
-                            {result.steps.filter((s) => s.type === 'target').length}個
+                            本命回収: <span className="text-green-400 font-medium">
+                                {result.steps.filter((s) => s.type === 'target').length}個
+                            </span>
                         </span>
                     </div>
                 </div>

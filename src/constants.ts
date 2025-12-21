@@ -3,6 +3,16 @@
  * 定数定義ファイル
  */
 
+/** 武器種リスト */
+export const WEAPON_TYPES = [
+    '大剣', '太刀', '片手剣', '双剣', 'ハンマー', '狩猟笛',
+    'ランス', 'ガンランス', 'スラッシュアックス', 'チャージアックス',
+    '操虫棍', 'ライトボウガン', 'ヘビィボウガン', '弓'
+] as const;
+
+/** 属性リスト */
+export const ELEMENT_TYPES = ['火', '水', '雷', '氷', '龍'] as const;
+
 /** シリーズスキル */
 export const SERIES_SKILLS = [
     '闘獣の力', '火竜の力', '暗器蛸の力', '鎧竜の守護', '雪獅子の闘志',
@@ -23,21 +33,11 @@ export const GROUP_SKILLS = [
 
 /** ボーナス種別 */
 export const BONUS_TYPES = [
-    '攻撃',
-    '会心率',
-    '防御',
-    '属性値',
-    '状態異常',
-    'スロット'
+    '攻撃', '会心率', '防御', '属性値', '状態異常', 'スロット'
 ] as const;
 
 /** ボーナス値 */
-export const BONUS_VALUES = [
-    'Lv1',
-    'Lv2',
-    'Lv3',
-    'EX'
-] as const;
+export const BONUS_VALUES = ['Lv1', 'Lv2', 'Lv3', 'EX'] as const;
 
 /** タブ定義 */
 export const TABS = [
