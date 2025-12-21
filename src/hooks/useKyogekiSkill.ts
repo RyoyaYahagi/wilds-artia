@@ -67,8 +67,9 @@ export function useKyogekiSkill() {
         isTarget: boolean = false
     ) => {
         const db = await getDB();
-        // 当該トラックの最大インデックスを取得
-        const trackResults = results.filter(r => r.trackId === trackId);
+        // DBから最新のトラック結果を取得して最大インデックスを計算
+        const allResults = await db.getAll('kyogekiSkillResults');
+        const trackResults = allResults.filter(r => r.trackId === trackId);
         const maxIndex = trackResults.length > 0
             ? Math.max(...trackResults.map(r => r.index))
             : 0;
@@ -85,7 +86,7 @@ export function useKyogekiSkill() {
         await db.add('kyogekiSkillResults', newResult);
         setResults(prev => [...prev, newResult]);
         return newResult.id;
-    }, [results]);
+    }, []);
 
     // ハズレ追加
     const addMiss = useCallback(async (trackId: string) => {

@@ -31,7 +31,7 @@ function getElementColor(element: ElementType): string {
         '氷': 'text-cyan-400',
         '龍': 'text-purple-400',
         '麻痺': 'text-amber-300',
-        '通常・貫通': 'text-zinc-300',
+        '通常': 'text-zinc-300',
     };
     return colors[element] || 'text-zinc-400';
 }
