@@ -27,34 +27,223 @@ function getElementColor(element: ElementType): string {
         '雷': 'text-yellow-400',
         '氷': 'text-cyan-400',
         '龍': 'text-purple-400',
+        '麻痺': 'text-amber-300',
+        '通常・貫通': 'text-zinc-300',
     };
     return colors[element] || 'text-zinc-400';
 }
 
 /** テストデータ生成 */
-function generateTestData(): { weaponType: WeaponType; element: ElementType; results: { series: string; group: string; isTarget: boolean }[] }[] {
+function generateTestData() {
     return [
         {
             weaponType: '双剣',
             element: '火',
             results: [
-                { series: '火竜の力', group: '-', isTarget: false },
-                { series: 'ハズレ', group: '-', isTarget: false },
-                { series: '闘獣の力', group: 'ヌシの魂', isTarget: true },
-                { series: 'ハズレ', group: '-', isTarget: false },
-                { series: '暗器蛸の力', group: '-', isTarget: false },
-            ],
+                { id: 1, series: '鎧竜の力', group: '-', isTarget: false },
+                { id: 2, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 3, series: '海竜の渦雷', group: '-', isTarget: false },
+                { id: 4, series: '千刃竜の闘志', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 5, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 6, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 7, series: '火竜の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 8, series: '鎖刃竜の飢餓', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 9, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 10, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 11, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 12, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 13, series: '火竜の力', group: '-', isTarget: false },
+                { id: 14, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 15, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 16, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 17, series: '泡狐竜の力', group: '-', isTarget: false },
+                { id: 18, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 19, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 20, series: '暗器蛸の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+            ]
         },
         {
-            weaponType: '太刀',
+            weaponType: '双剣',
+            element: '龍',
+            results: [
+                { id: 1, series: '嵐竜の力', group: '-', isTarget: false },
+                { id: 2, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 3, series: '雪獅子の闘志', group: '-', isTarget: false },
+                { id: 4, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 5, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 6, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 7, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 8, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 9, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 10, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 11, series: '千刃竜の闘志', group: '-', isTarget: false },
+                { id: 12, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 13, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 14, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 15, series: '白織竜の脈動', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 16, series: '獄焔蛸の反逆', group: '-', isTarget: false },
+                { id: 17, series: '海竜の渦雷', group: '-', isTarget: false },
+                { id: 18, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 19, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 20, series: '煌雷竜の力', group: '-', isTarget: false },
+            ]
+        },
+        {
+            weaponType: 'ガンランス',
+            element: '麻痺',
+            results: [
+                { id: 1, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 2, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 3, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 4, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 5, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 6, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 7, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 8, series: '獄焔蛸の反逆', group: '-', isTarget: false },
+                { id: 9, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+                { id: 10, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 11, series: '波衣竜の守護', group: '-', isTarget: false },
+                { id: 12, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 13, series: '火竜の力', group: '-', isTarget: false },
+                { id: 14, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 15, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 16, series: '火竜の力', group: '-', isTarget: false },
+                { id: 17, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 18, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 19, series: '海竜の渦雷', group: '-', isTarget: false },
+                { id: 20, series: '海竜の渦雷', group: '-', isTarget: false },
+            ]
+        },
+        {
+            weaponType: 'ライトボウガン',
+            element: '通常・貫通', // 画像では通常と貫通が同じテーブル
+            results: [
+                { id: 1, series: '闘獣の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 2, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 3, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 4, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 5, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 6, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 7, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 8, series: '獄焔蛸の反逆', group: '-', isTarget: false },
+                { id: 9, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 10, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 11, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 12, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 13, series: '獄焔蛸の反逆', group: '-', isTarget: false },
+                { id: 14, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 15, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 16, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 17, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 18, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 19, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 20, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+            ]
+        },
+        {
+            weaponType: 'ヘビィボウガン',
+            element: '火',
+            results: [
+                { id: 1, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 2, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 3, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 4, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 5, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 6, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 7, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 8, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 9, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 10, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 11, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+                { id: 12, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 13, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 14, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 15, series: '雪獅子の闘志', group: '-', isTarget: false },
+                { id: 16, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 17, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 18, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 19, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 20, series: '火竜の力', group: '-', isTarget: false },
+            ]
+        },
+        {
+            weaponType: 'ヘビィボウガン',
+            element: '水',
+            results: [
+                { id: 1, series: 'オメガレゾナンス', group: '-', isTarget: false },
+                { id: 2, series: '兇爪竜の力', group: '-', isTarget: false },
+                { id: 3, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 4, series: 'オメガレゾナンス', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 5, series: '海竜の渦雷', group: '-', isTarget: false },
+                { id: 6, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 7, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 8, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 9, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 10, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 11, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 12, series: '火竜の力', group: '-', isTarget: false },
+                { id: 13, series: '雪獅子の闘志', group: '-', isTarget: false },
+                { id: 14, series: '波衣竜の守護', group: '-', isTarget: false },
+                { id: 15, series: '凍峰竜の反逆', group: '-', isTarget: false },
+                { id: 16, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 17, series: '泡狐竜の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 18, series: '雪獅子の闘志', group: '-', isTarget: false },
+                { id: 19, series: '煌雷竜の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 20, series: '海竜の渦雷', group: '-', isTarget: false },
+            ]
+        },
+        {
+            weaponType: 'ヘビィボウガン',
             element: '雷',
             results: [
-                { series: 'ハズレ', group: '-', isTarget: false },
-                { series: '雷顎竜の闘志', group: '-', isTarget: false },
-                { series: 'ハズレ', group: '-', isTarget: false },
-                { series: '煌雷竜の力', group: 'ヌシの魂', isTarget: true },
-            ],
+                { id: 1, series: '暗黒騎士の証', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 2, series: '鎖刃竜の飢餓', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 3, series: '海竜の渦雷', group: '-', isTarget: false },
+                { id: 4, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 5, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 6, series: '煌雷竜の力', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 7, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 8, series: '獄焔蛸の反逆', group: '-', isTarget: false },
+                { id: 9, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 10, series: '波衣竜の守護', group: '-', isTarget: false },
+                { id: 11, series: '火竜の力', group: '-', isTarget: false },
+                { id: 12, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+                { id: 13, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 14, series: '鎧竜の守護', group: '-', isTarget: false },
+                { id: 15, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 16, series: '波衣竜の守護', group: '-', isTarget: false },
+                { id: 17, series: '波衣竜の守護', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 18, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 19, series: '波衣竜の守護', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 20, series: '黒蝕竜の力', group: '-', isTarget: false },
+            ]
         },
+        {
+            weaponType: 'ヘビィボウガン',
+            element: '氷',
+            results: [
+                { id: 1, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+                { id: 2, series: '千刃竜の闘志', group: '-', isTarget: false },
+                { id: 3, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 4, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 5, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 6, series: '闘獣の力', group: '-', isTarget: false },
+                { id: 7, series: '黒蝕竜の力', group: '-', isTarget: false },
+                { id: 8, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 9, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
+                { id: 10, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 11, series: '雷顎竜の闘志', group: '-', isTarget: false },
+                { id: 12, series: '千刃竜の闘志', group: '-', isTarget: false },
+                { id: 13, series: '波衣竜の守護', group: '-', isTarget: false },
+                { id: 14, series: '暗器蛸の力', group: '-', isTarget: false },
+                { id: 15, series: '巨戟竜の黙示録', group: '-', isTarget: false },
+                { id: 16, series: '煌雷竜の力', group: '-', isTarget: false },
+                { id: 17, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
+                { id: 18, series: '雪獅子の闘志', group: '-', isTarget: false },
+                { id: 19, series: '暗黒騎士の証', group: '-', isTarget: false },
+                { id: 20, series: '黒蝕竜の力', group: '-', isTarget: false },
+            ]
+        }
     ];
 }
 
@@ -199,7 +388,7 @@ export function KyogekiSkillMode() {
             const exists = tracks.some(t => t.weaponType === data.weaponType && t.element === data.element);
             if (exists) continue;
 
-            const trackId = await addTrack(data.weaponType, data.element);
+            const trackId = await addTrack(data.weaponType as WeaponType, data.element as ElementType);
             setExpandedTracks(prev => new Set([...prev, trackId]));
 
             for (const r of data.results) {

@@ -11,7 +11,7 @@ export const WEAPON_TYPES = [
 ] as const;
 
 /** 属性リスト */
-export const ELEMENT_TYPES = ['火', '水', '雷', '氷', '龍'] as const;
+export const ELEMENT_TYPES = ['火', '水', '雷', '氷', '龍', '麻痺', '通常・貫通'] as const;
 
 /** シリーズスキル */
 export const SERIES_SKILLS = [
