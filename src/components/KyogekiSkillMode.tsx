@@ -29,7 +29,7 @@ function getElementColor(element: ElementType): string {
         '氷': 'text-cyan-400',
         '龍': 'text-purple-400',
         '麻痺': 'text-amber-300',
-        '通常・貫通': 'text-zinc-300',
+        '通常': 'text-zinc-300',
     };
     return colors[element] || 'text-zinc-400';
 }
@@ -117,7 +117,7 @@ function generateTestData() {
         },
         {
             weaponType: 'ライトボウガン',
-            element: '通常・貫通', // 画像では通常と貫通が同じテーブル
+            element: '通常', // ライトボウガン通常弾
             results: [
                 { id: 1, series: '闘獣の力', group: 'ヌシの魂', isTarget: true }, // 当たり
                 { id: 2, series: '暗器蛸の力', group: '-', isTarget: false },

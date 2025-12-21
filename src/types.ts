@@ -10,7 +10,7 @@ export type WeaponType =
     | '操虫棍' | 'ライトボウガン' | 'ヘビィボウガン' | '弓';
 
 /** 属性 */
-export type ElementType = '火' | '水' | '雷' | '氷' | '龍' | '麻痺' | '通常・貫通';
+export type ElementType = '火' | '水' | '雷' | '氷' | '龍' | '麻痺' | '通常';
 
 /** タブモード */
 export type TabMode = 'normalRestore' | 'kyogekiSkill' | 'kyogekiRestore';

@@ -20,7 +20,7 @@ function getElementBgColor(element: ElementType): string {
         '氷': 'bg-cyan-500/20',
         '龍': 'bg-purple-500/20',
         '麻痺': 'bg-amber-500/20',
-        '通常・貫通': 'bg-zinc-500/20',
+        '通常': 'bg-zinc-500/20',
     };
     return colors[element] || 'bg-zinc-800';
 }
