@@ -13,26 +13,14 @@ import {
 } from '../constants';
 import { OptimizationChart } from './OptimizationChart';
 import { SkillTable } from './SkillTable';
+import { getElementColor, generateSkillOptimization } from '../utils';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from './Toast';
 import type {
-    OptimizationResult, KyogekiSkillResult, Track,
-    WeaponType, ElementType
+    WeaponType, ElementType, OptimizationResult
 } from '../types';
 
-/** 属性カラー */
-function getElementColor(element: ElementType): string {
-    const colors: Record<ElementType, string> = {
-        '火': 'text-orange-500',
-        '水': 'text-blue-400',
-        '雷': 'text-yellow-400',
-        '氷': 'text-cyan-400',
-        '龍': 'text-purple-400',
-        '麻痺': 'text-amber-300',
-        '通常': 'text-zinc-300',
-    };
-    return colors[element] || 'text-zinc-400';
-}
+// getElementColor は ../utils からインポート
 
 /** テストデータ生成 */
 function generateTestData() {
@@ -67,11 +55,11 @@ function generateTestData() {
             weaponType: '双剣',
             element: '龍',
             results: [
-                { id: 1, series: '嵐竜の力', group: '-', isTarget: false },
+                { id: 1, series: '暗器蛸の力', group: '-', isTarget: false },
                 { id: 2, series: '鎧竜の守護', group: '-', isTarget: false },
                 { id: 3, series: '雪獅子の闘志', group: '-', isTarget: false },
                 { id: 4, series: '雷顎竜の闘志', group: '-', isTarget: false },
-                { id: 5, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 5, series: '白熾竜の脈動', group: '-', isTarget: false },
                 { id: 6, series: '闘獣の力', group: '-', isTarget: false },
                 { id: 7, series: '鎖刃竜の飢餓', group: '-', isTarget: false },
                 { id: 8, series: '黒蝕竜の力', group: '-', isTarget: false },
@@ -81,7 +69,7 @@ function generateTestData() {
                 { id: 12, series: '凍峰竜の反逆', group: '-', isTarget: false },
                 { id: 13, series: '黒蝕竜の力', group: '-', isTarget: false },
                 { id: 14, series: '暗器蛸の力', group: '-', isTarget: false },
-                { id: 15, series: '白織竜の脈動', group: 'ヌシの魂', isTarget: true }, // 当たり
+                { id: 15, series: '白熾竜の脈動', group: 'ヌシの魂', isTarget: true }, // 当たり
                 { id: 16, series: '獄焔蛸の反逆', group: '-', isTarget: false },
                 { id: 17, series: '海竜の渦雷', group: '-', isTarget: false },
                 { id: 18, series: '鎧竜の守護', group: '-', isTarget: false },
@@ -157,7 +145,7 @@ function generateTestData() {
                 { id: 10, series: '凍峰竜の反逆', group: '-', isTarget: false },
                 { id: 11, series: '巨戟竜の黙示録', group: '-', isTarget: false },
                 { id: 12, series: '兇爪竜の力', group: '-', isTarget: false },
-                { id: 13, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 13, series: '白熾竜の脈動', group: '-', isTarget: false },
                 { id: 14, series: '兇爪竜の力', group: '-', isTarget: false },
                 { id: 15, series: '雪獅子の闘志', group: '-', isTarget: false },
                 { id: 16, series: '暗器蛸の力', group: '-', isTarget: false },
@@ -179,7 +167,7 @@ function generateTestData() {
                 { id: 6, series: '煌雷竜の力', group: '-', isTarget: false },
                 { id: 7, series: '護鎖刃竜の命脈', group: '-', isTarget: false },
                 { id: 8, series: '闘獣の力', group: '-', isTarget: false },
-                { id: 9, series: '白織竜の脈動', group: '-', isTarget: false },
+                { id: 9, series: '白熾竜の脈動', group: '-', isTarget: false },
                 { id: 10, series: '煌雷竜の力', group: '-', isTarget: false },
                 { id: 11, series: '暗器蛸の力', group: '-', isTarget: false },
                 { id: 12, series: '火竜の力', group: '-', isTarget: false },
@@ -248,59 +236,7 @@ function generateTestData() {
     ];
 }
 
-/** 最適化チャート生成（全トラック横断） */
-function generateOptimization(
-    tracks: Track[],
-    results: KyogekiSkillResult[]
-): OptimizationResult {
-    const targets = results.filter(r => r.isTarget);
-    if (targets.length === 0) {
-        return { steps: [], maxIndex: 0, conflicts: [] };
-    }
-
-    const indexMap = new Map<number, KyogekiSkillResult[]>();
-    for (const t of targets) {
-        const existing = indexMap.get(t.index) || [];
-        existing.push(t);
-        indexMap.set(t.index, existing);
-    }
-
-    const conflicts: OptimizationResult['conflicts'] = [];
-    for (const [index, items] of indexMap) {
-        if (items.length > 1) {
-            conflicts.push({
-                index,
-                entries: items.map(r => {
-                    const track = tracks.find(t => t.id === r.trackId);
-                    return {
-                        label: `${r.seriesSkill}/${r.groupSkill}`,
-                        trackLabel: track ? `${track.element}${track.weaponType}` : '不明',
-                    };
-                }),
-            });
-        }
-    }
-
-    const maxIndex = Math.max(...targets.map(t => t.index));
-    const steps: OptimizationResult['steps'] = [];
-
-    for (let i = 1; i <= maxIndex; i++) {
-        const target = targets.find(t => t.index === i);
-        if (target) {
-            const track = tracks.find(t => t.id === target.trackId);
-            steps.push({
-                index: i,
-                type: 'target',
-                label: `${target.seriesSkill}${target.groupSkill !== '-' ? ` / ${target.groupSkill}` : ''}`,
-                trackLabel: track ? `${track.element}${track.weaponType}` : undefined,
-            });
-        } else {
-            steps.push({ index: i, type: 'skip', label: '任意の武器で強化' });
-        }
-    }
-
-    return { steps, maxIndex, conflicts };
-}
+// generateOptimization は ../utils の generateSkillOptimization を使用
 
 export function KyogekiSkillMode() {
     const {
@@ -353,7 +289,7 @@ export function KyogekiSkillMode() {
     }, [addResult, selectedSeries]);
 
     const handleGenerate = useCallback(() => {
-        const result = generateOptimization(tracks, results);
+        const result = generateSkillOptimization(tracks, results);
         setOptimization(result);
     }, [tracks, results]);
 

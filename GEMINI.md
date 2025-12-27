@@ -11,10 +11,10 @@
 ### 2) 言語／ランタイム
    - 言語: TypeScript (Node.js)
    - 推奨実行環境: Node.js 20.x LTS
-   - フレームワーク: Next.js 15 (App Router)
+   - フレームワーク: Vite + React 18
 
 ### 3) 主要ツール／チェック
-   - フォーマッタ: Prettier (Next.js 標準)
+   - フォーマッタ: Prettier
    - Linter / 型チェック: ESLint + TypeScript tsc (`npm run lint`)
    - ビルド確認: `npm run build`
    - 開発サーバー: `npm run dev`
@@ -25,7 +25,7 @@
 
 ### 5) コーディング規約（必須）
    - 型注釈: すべてのコンポーネント Props、関数引数・戻り値に型定義必須
-   - パス操作: Next.js の `@/` エイリアスを使用
+   - パス操作: 相対パスを使用
    - コンポーネント: 関数コンポーネント + React Hooks のみ使用
    - スタイリング: Tailwind CSS クラスを使用（インラインスタイル禁止）
    - Docstring: JSDoc 形式、日本語で記述
