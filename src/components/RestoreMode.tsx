@@ -10,11 +10,11 @@ import {
 import { useRestore } from '../hooks/useRestore';
 import { BONUS_TYPES, BONUS_VALUES, WEAPON_TYPES, ELEMENT_TYPES } from '../constants';
 import { OptimizationChart } from './OptimizationChart';
+import { getElementColor, generateRestoreOptimization } from '../utils';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from './Toast';
 import type {
-    OptimizationResult, RestoreResult, Track,
-    WeaponType, ElementType
+    WeaponType, ElementType, OptimizationResult
 } from '../types';
 
 interface RestoreModeProps {
@@ -22,73 +22,9 @@ interface RestoreModeProps {
     title: string;
 }
 
-/** 属性カラー */
-function getElementColor(element: ElementType): string {
-    const colors: Record<ElementType, string> = {
-        '火': 'text-orange-500',
-        '水': 'text-blue-400',
-        '雷': 'text-yellow-400',
-        '氷': 'text-cyan-400',
-        '龍': 'text-purple-400',
-        '麻痺': 'text-amber-300',
-        '通常': 'text-zinc-300',
-    };
-    return colors[element] || 'text-zinc-400';
-}
+// getElementColor は ../utils からインポート
 
-/** 最適化チャート生成（全トラック横断） */
-function generateOptimization(
-    tracks: Track[],
-    results: RestoreResult[]
-): OptimizationResult {
-    const targets = results.filter(r => r.isTarget);
-    if (targets.length === 0) {
-        return { steps: [], maxIndex: 0, conflicts: [] };
-    }
-
-    const indexMap = new Map<number, RestoreResult[]>();
-    for (const t of targets) {
-        const existing = indexMap.get(t.index) || [];
-        existing.push(t);
-        indexMap.set(t.index, existing);
-    }
-
-    const conflicts: OptimizationResult['conflicts'] = [];
-    for (const [index, items] of indexMap) {
-        if (items.length > 1) {
-            conflicts.push({
-                index,
-                entries: items.map(r => {
-                    const track = tracks.find(t => t.id === r.trackId);
-                    return {
-                        label: `${r.bonusType} ${r.bonusValue}`,
-                        trackLabel: track ? `${track.element}${track.weaponType}` : '不明',
-                    };
-                }),
-            });
-        }
-    }
-
-    const maxIndex = Math.max(...targets.map(t => t.index));
-    const steps: OptimizationResult['steps'] = [];
-
-    for (let i = 1; i <= maxIndex; i++) {
-        const target = targets.find(t => t.index === i);
-        if (target) {
-            const track = tracks.find(t => t.id === target.trackId);
-            steps.push({
-                index: i,
-                type: 'target',
-                label: `${target.bonusType} ${target.bonusValue}`,
-                trackLabel: track ? `${track.element}${track.weaponType}` : undefined,
-            });
-        } else {
-            steps.push({ index: i, type: 'skip', label: '任意の武器で強化' });
-        }
-    }
-
-    return { steps, maxIndex, conflicts };
-}
+// generateOptimization は ../utils の generateRestoreOptimization を使用
 
 export function RestoreMode({ store, title }: RestoreModeProps) {
     const {
@@ -123,7 +59,7 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
         }
         const id = await addTrack(newWeapon, newElement);
         setExpandedTracks(prev => new Set([...prev, id]));
-    }, [addTrack, newWeapon, newElement, tracks]);
+    }, [addTrack, newWeapon, newElement, tracks, showToast]);
 
     const toggleExpand = useCallback((trackId: string) => {
         setExpandedTracks(prev => {
@@ -142,7 +78,7 @@ export function RestoreMode({ store, title }: RestoreModeProps) {
     }, [addResult, selectedType, selectedValue]);
 
     const handleGenerate = useCallback(() => {
-        const result = generateOptimization(tracks, results);
+        const result = generateRestoreOptimization(tracks, results);
         setOptimization(result);
     }, [tracks, results]);
 
