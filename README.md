@@ -1,9 +1,9 @@
 # Efficient Artian Optimizer
 
-[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Deploy-Cloudflare%20Pages-orange)](https://wilds-artia.pages.dev)
+[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Deploy-Cloudflare-orange)](https://wilds-artia.yhgry.workers.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**[🎮 アプリを使う](https://wilds-artia.pages.dev)**
+**[🎮 アプリを使う](https://wilds-artia.yhgry.workers.dev/)**
 
 Monster Hunter Wilds（モンスターハンターワイルズ）のアーティア武器厳選を効率化するWebアプリケーションです。
 
